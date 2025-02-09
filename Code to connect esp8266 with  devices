@@ -1,0 +1,46 @@
+#include <ESP8266WiFi.h>
+#include <WebSocketsServer.h>
+
+const char* ssid = "";         // Change to your Wi-Fi SSID
+const char* password = ""; // Change to your Wi-Fi password
+
+WebSocketsServer webSocket(81);
+WiFiServer server(80);
+
+const int eegPin = A0;  // EEG signal input pin
+const int baudRate = 115200;
+
+void setup() {
+    Serial.begin(baudRate);
+    WiFi.begin(ssid, password);
+    
+    Serial.println("Connecting to WiFi...");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    
+    Serial.println("\nWiFi Connected. IP Address: " + WiFi.localIP().toString());
+    webSocket.begin();
+    webSocket.onEvent(webSocketEvent);
+}
+
+void loop() {
+    int eegValue = analogRead(eegPin); // Read EEG signal
+    String eegData = String(eegValue);
+    
+    // Send via Serial (for debugging)
+    Serial.println(eegValue);
+    
+    // Send EEG data over WebSocket
+    webSocket.broadcastTXT(eegData);
+    
+    delay(10);  // Adjust for ~100Hz sampling rate
+}
+
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+    if (type == WStype_CONNECTED) {
+        Serial.println("WebSocket Client Connected");
+    }
+}
+
