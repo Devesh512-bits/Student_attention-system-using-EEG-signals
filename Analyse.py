@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 import os
 
 # Load Data
-file_path = r'C:\Users\S K GARG\Desktop\New EDAI\eeg_preprocessed_data_20250208_175122.csv'
+file_path = '// you need to specify the path of csv file here//'
 
 if not os.path.exists(file_path):
     raise FileNotFoundError(f"File not found: {file_path}")
